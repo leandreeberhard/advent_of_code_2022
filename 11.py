@@ -61,7 +61,11 @@ class Monkey:
         self.items_inspected = 0
 
     def __repr__(self):
-        return f"{self.ind=}, {self.items_inspected=}" 
+        if len(self.starting_items) > 0 and isinstance(self.starting_items[0], list):
+            #return f"{self.ind=}, {self.items_inspected=}, starting_items={[apply_operations(x) for x in self.starting_items]}" 
+            return f"{self.ind=}, {self.items_inspected=}"
+        else:
+            return f"{self.ind=}, {self.items_inspected=}"
 
     def turn(self):
         target_monkeys = []
@@ -82,21 +86,32 @@ class Monkey:
         self.starting_items = []
         return target_monkeys
            
+    #def turn_v2(self):
+    #    target_monkeys = []
+    #    for i, item in enumerate(self.starting_items):
+    #        # step 1: apply operation to the starting_items
+    #        # now instead of saving the number, save a list of operations
+    #        item.append(self.operation)
+    #       
+    #        # apply all the operations to the starting value 
+    #        target_monkey = self.test(apply_operations(item))
+    #        target_monkeys.append((target_monkey, item))
+    #       
+    #        # keep track of items inspected
+    #        self.items_inspected += 1
+
+    #    # throw away all items
+    #    self.starting_items = []
+    #    return target_monkeys
     def turn_v2(self):
         target_monkeys = []
         for i, item in enumerate(self.starting_items):
-            # step 1: apply operation to the starting_items
-            # now instead of saving the number, save a list of operations
-            item.append(self.operation)
-           
-            # apply all the operations to the starting value 
-            target_monkey = self.test(apply_operations(item))
-            target_monkeys.append((target_monkey, item))
-           
-            # keep track of items inspected
+            self.starting_items[i] = self.operation(self.starting_items[i])
+            self.starting_items[i] //= 3
+            target_monkey = self.test(self.starting_items[i])
+            target_monkeys.append((target_monkey, self.starting_items[i]))
             self.items_inspected += 1
 
-        # throw away all items
         self.starting_items = []
         return target_monkeys
 
@@ -144,9 +159,9 @@ print(sorted_monkeys[0].items_inspected * sorted_monkeys[1].items_inspected)
 
 
 parsed_monkeys_v2 = [parse_monkey(string) for string in processed_data]
-for m in parsed_monkeys_v2:
-    for i in range(len(m.starting_items)):
-        m.starting_items[i] = [m.starting_items[i]]
+#for m in parsed_monkeys_v2:
+#    for i in range(len(m.starting_items)):
+#        m.starting_items[i] = [m.starting_items[i]]
 
 def simulate_round_v2(parsed_monkeys):
     for monkey in parsed_monkeys:
@@ -155,10 +170,16 @@ def simulate_round_v2(parsed_monkeys):
         for target_monkey, worry_level in target_monkeys:
             parsed_monkeys[target_monkey].catch_item(worry_level)
 
-for i in range(400):
-    print(f"simulating round {i}")
+round_to_print = [1, 20, 1000, 2000, 3000, 4000, 5000]
+for i in range(5000):
     simulate_round_v2(parsed_monkeys_v2)
-print(parsed_monkeys_v2)
+    if i+1 in round_to_print:
+        print(parsed_monkeys_v2)    
 
 
- 
+
+
+
+
+
+
